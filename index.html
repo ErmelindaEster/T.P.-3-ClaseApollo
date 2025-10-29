@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Plantilla Supabase - Listado de Alumnos</title>
+  <!--
+    ========================= ZONA DE DISEÑO =========================
+    Aquí podrás agregar tu diseño más adelante (Bootstrap, Navbar, etc.)
+    - <link> a CSS de Bootstrap
+    - Navbar / Footer
+    - Clases y contenedores
+    ==================================================================
+  -->
+</head>
+<body>
+  <!-- ========================= ZONA DE DISEÑO (NAVBAR) =========================
+       Inserta aquí tu Navbar (HTML puro ahora; luego podrás aplicar Bootstrap)
+  ========================================================================= -->
+  <header>
+    <h1>Listado de Alumnos</h1>
+    <!-- Puedes reemplazar este encabezado por uno con estilos más adelante -->
+  </header>
+
+  <main>
+    <!-- Mensajes al usuario: cargando, éxito, errores -->
+    <div id="estado" role="status" aria-live="polite">Cargando datos...</div>
+
+    <!-- Contenedor donde se insertarán los resultados -->
+    <section id="resultado">
+      <!--
+        ========================= ZONA DE DISEÑO (LISTA) =========================
+        Puedes envolver esta sección en un "container" cuando uses Bootstrap.
+        También puedes cambiar <ul> por tarjetas (<div>) con grillas, etc.
+      ===========================================================================
+      -->
+      <ul id="lista-alumnos"></ul>
+    </section>
+  </main>
+
+  <!-- ========================= ZONA DE DISEÑO (FOOTER) =========================
+       Agrega aquí tu pie de página cuando apliques tu framework de diseño
+  ========================================================================= -->
+
+  <!-- Dependencia: Supabase JS v2 desde CDN (ESM) -->
+  <script type="module">
+    // Importar el cliente de Supabase (versión 2) desde la CDN
+    import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm';
+
+    // ====================== Configuración de Supabase ======================
+    // NOTA: Esta clave Anónima es pública por diseño. Mantén las políticas RLS configuradas.
+    const SUPABASE_URL = 'https://ykgnmdhtiymovgeapaif.supabase.co';
+    const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InlrZ25tZGh0aXltb3ZnZWFwYWlmIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjA4NTU1OTcsImV4cCI6MjA3NjQzMTU5N30.j472eqejn8GIhGRyOApsLY7xU70fkkQrl9IhX_44tr0';
+
+    // Inicializar el cliente
+    const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+    // Referencias a elementos del DOM
+    const estadoEl = document.getElementById('estado');
+    const listaEl = document.getElementById('lista-alumnos');
+
+    // Utilidad para limpiar e informar al usuario
+    function mostrarEstado(mensaje) {
+      estadoEl.textContent = mensaje;
+    }
+
+    // Crea un <li> con los pares "Etiqueta: valor" para cada columna
+    function crearItemAlumno(fila) {
+      const li = document.createElement('li');
+
+      // ========================= ZONA DE DISEÑO (ITEM) =========================
+      // Aquí podrás convertir cada <li> en una tarjeta <div> y aplicar clases
+      // Bootstrap (card, row, col, etc.) cuando agregues tu framework.
+      // =========================================================================
+
+      // Construimos el contenido en HTML básico, mostrando "Columna: valor"
+      // Aseguramos que los valores nulos/indefinidos se muestren claramente.
+      const id = (fila.id ?? '—');
+      const nombre = (fila.nombre ?? '—');
+      const edad = (fila.edad ?? '—');
+      const matriculado = (fila.matriculado === true) ? 'Sí' : (fila.matriculado === false ? 'No' : '—');
+      const fecha = fila.fecha_registro ? new Date(fila.fecha_registro).toLocaleString() : '—';
+
+      li.innerHTML = `
+        <div><strong>Id:</strong> ${id}</div>
+        <div><strong>Nombre:</strong> ${nombre}</div>
+        <div><strong>Edad:</strong> ${edad}</div>
+        <div><strong>Matriculado:</strong> ${matriculado}</div>
+        <div><strong>Fecha de registro:</strong> ${fecha}</div>
+      `;
+      return li;
+    }
+
+    // Consulta todos los datos de la tabla "public.alumnos" y puebla la vista
+    async function cargarAlumnos() {
+      try {
+        mostrarEstado('Cargando datos de Supabase...');
+        listaEl.innerHTML = ''; // limpiar resultados previos
+
+        // Consulta básica (puedes ajustar el orden si lo deseas)
+        const { data, error } = await supabase
+          .from('alumnos')
+          .select('*')
+          .order('id', { ascending: true });
+
+        if (error) {
+          // Error de Supabase (consulta/RLS/conexión)
+          console.error('Error en Supabase:', error);
+          mostrarEstado('No se pudo obtener la información. Detalle: ' + (error.message || 'Error desconocido.'));
+          return;
+        }
+
+        if (!data || data.length === 0) {
+          mostrarEstado('No hay registros para mostrar.');
+          return;
+        }
+
+        // Éxito: iterar sobre los resultados y crear elementos HTML
+        data.forEach((fila) => {
+          const item = crearItemAlumno(fila);
+          listaEl.appendChild(item);
+        });
+
+        mostrarEstado('Datos cargados correctamente.');
+      } catch (e) {
+        // Errores inesperados (red, parseo, etc.)
+        console.error('Excepción al cargar datos:', e);
+        mostrarEstado('Ocurrió un error al conectarse o consultar los datos. Inténtalo nuevamente más tarde.');
+      }
+    }
+
+    // Disparar la carga al iniciar
+    document.addEventListener('DOMContentLoaded', cargarAlumnos);
+  </script>
+</body>
+</html>
+
+
+
+
+
+
+Is this conversation helpful so far?
+
+
+
+
+MODO DE DESARROLLADOR
+
+
+
+
