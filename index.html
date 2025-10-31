@@ -3,150 +3,160 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Plantilla Supabase - Listado de Alumnos</title>
-  <!--
-    ========================= ZONA DE DISEÑO =========================
-    Aquí podrás agregar tu diseño más adelante (Bootstrap, Navbar, etc.)
-    - <link> a CSS de Bootstrap
-    - Navbar / Footer
-    - Clases y contenedores
-    ==================================================================
-  -->
+  <title>Listado de Alumnos</title>
+
+  <!-- Bootstrap 5 -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+
+  <style>
+    body { background:#f7f9fc; }
+    header.hero{
+      position:relative; overflow:hidden;
+      border-bottom-left-radius:20px; border-bottom-right-radius:20px;
+      box-shadow:0 6px 18px rgba(0,0,0,.08);
+    }
+    header.hero img{
+      width:100%; height:320px; object-fit:cover; filter:brightness(.8);
+      display:block;
+    }
+    header.hero .overlay{
+      position:absolute; inset:0; display:grid; place-items:center;
+    }
+    .btn-brand{ background:#0d6efd; border:none; }
+    .btn-brand:hover{ background:#0b5ed7; }
+    .card{ border:0; border-radius:18px; box-shadow:0 10px 24px rgba(0,0,0,.06); }
+    .card-img-top{ border-top-left-radius:18px; border-top-right-radius:18px; height:180px; object-fit:cover; }
+    footer{ background:#0f172a; color:#e2e8f0; }
+  </style>
 </head>
+
 <body>
-  <!-- ========================= ZONA DE DISEÑO (NAVBAR) =========================
-       Inserta aquí tu Navbar (HTML puro ahora; luego podrás aplicar Bootstrap)
-  ========================================================================= -->
-  <header>
-    <h1>Listado de Alumnos</h1>
-    <!-- Puedes reemplazar este encabezado por uno con estilos más adelante -->
+  <!-- NAV -->
+  <nav class="navbar navbar-light bg-light sticky-top shadow-sm">
+    <div class="container">
+      <a class="navbar-brand" href="#">🎓 Alumnos</a>
+      <a class="btn btn-outline-primary" href="#video">Video</a>
+    </div>
+  </nav>
+
+  <!-- HERO: imagen + botón ENTRAR -->
+  <header class="hero">
+    <img src="https://images.unsplash.com/photo-1513258496099-48168024aec0?q=80&w=1600&auto=format&fit=crop" alt="Encabezado">
+    <div class="overlay">
+      <a href="#lista" class="btn btn-brand btn-lg text-white px-4">Entrar</a>
+    </div>
   </header>
 
-  <main>
-    <!-- Mensajes al usuario: cargando, éxito, errores -->
-    <div id="estado" role="status" aria-live="polite">Cargando datos...</div>
+  <!-- CUERPO -->
+  <main class="container my-5" id="lista">
+    <!-- Estado / mensajes -->
+    <div id="estado" class="alert alert-info text-center" role="status" aria-live="polite">
+      Cargando datos…
+    </div>
 
-    <!-- Contenedor donde se insertarán los resultados -->
-    <section id="resultado">
-      <!--
-        ========================= ZONA DE DISEÑO (LISTA) =========================
-        Puedes envolver esta sección en un "container" cuando uses Bootstrap.
-        También puedes cambiar <ul> por tarjetas (<div>) con grillas, etc.
-      ===========================================================================
-      -->
-      <ul id="lista-alumnos"></ul>
+    <!-- Grid de tarjetas -->
+    <div id="resultado" class="row g-4">
+      <!-- JS insertará aquí las tarjetas -->
+    </div>
+
+    <!-- VIDEO -->
+    <section id="video" class="mt-5">
+      <h2 class="h4 mb-3 text-center">🎬 Video del Proyecto (Alumnos)</h2>
+
+      <div class="ratio ratio-16x9 shadow rounded-3">
+        <!-- 🎥 Video de YouTube actualizado -->
+        <iframe
+          src="https://www.youtube.com/embed/yjAT2ob76NA"
+          title="Video del Proyecto Alumnos"
+          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+          allowfullscreen>
+        </iframe>
+      </div>
     </section>
   </main>
 
-  <!-- ========================= ZONA DE DISEÑO (FOOTER) =========================
-       Agrega aquí tu pie de página cuando apliques tu framework de diseño
-  ========================================================================= -->
+  <!-- PIE -->
+  <footer class="py-4 mt-5">
+    <div class="container text-center">
+      <small>Hecho por <strong>Delgado Ester</strong> 2025.</small>
+    </div>
+  </footer>
 
-  <!-- Dependencia: Supabase JS v2 desde CDN (ESM) -->
+  <!-- Bootstrap JS -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+
+  <!-- Supabase + Lógica -->
   <script type="module">
-    // Importar el cliente de Supabase (versión 2) desde la CDN
     import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm';
 
-    // ====================== Configuración de Supabase ======================
-    // NOTA: Esta clave Anónima es pública por diseño. Mantén las políticas RLS configuradas.
+    // === Credenciales Supabase ===
     const SUPABASE_URL = 'https://ykgnmdhtiymovgeapaif.supabase.co';
     const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InlrZ25tZGh0aXltb3ZnZWFwYWlmIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjA4NTU1OTcsImV4cCI6MjA3NjQzMTU5N30.j472eqejn8GIhGRyOApsLY7xU70fkkQrl9IhX_44tr0';
 
-    // Inicializar el cliente
     const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
-    // Referencias a elementos del DOM
     const estadoEl = document.getElementById('estado');
-    const listaEl = document.getElementById('lista-alumnos');
+    const resultadoEl = document.getElementById('resultado');
 
-    // Utilidad para limpiar e informar al usuario
-    function mostrarEstado(mensaje) {
-      estadoEl.textContent = mensaje;
+    function mostrarEstado(msg, tipo='info'){
+      estadoEl.className = `alert alert-${tipo} text-center`;
+      estadoEl.textContent = msg;
     }
 
-    // Crea un <li> con los pares "Etiqueta: valor" para cada columna
-    function crearItemAlumno(fila) {
-      const li = document.createElement('li');
+    function crearTarjetaAlumno(fila){
+      const col = document.createElement('div');
+      col.className = 'col-12 col-sm-6 col-lg-4';
 
-      // ========================= ZONA DE DISEÑO (ITEM) =========================
-      // Aquí podrás convertir cada <li> en una tarjeta <div> y aplicar clases
-      // Bootstrap (card, row, col, etc.) cuando agregues tu framework.
-      // =========================================================================
+      const foto = fila.foto_url
+        ? fila.foto_url
+        : `https://picsum.photos/seed/alumno-${fila.id ?? Math.floor(Math.random()*9999)}/600/360`;
 
-      // Construimos el contenido en HTML básico, mostrando "Columna: valor"
-      // Aseguramos que los valores nulos/indefinidos se muestren claramente.
-      const id = (fila.id ?? '—');
-      const nombre = (fila.nombre ?? '—');
-      const edad = (fila.edad ?? '—');
-      const matriculado = (fila.matriculado === true) ? 'Sí' : (fila.matriculado === false ? 'No' : '—');
+      const matriculado = fila.matriculado === true ? 'Sí' : (fila.matriculado === false ? 'No' : '—');
       const fecha = fila.fecha_registro ? new Date(fila.fecha_registro).toLocaleString() : '—';
 
-      li.innerHTML = `
-        <div><strong>Id:</strong> ${id}</div>
-        <div><strong>Nombre:</strong> ${nombre}</div>
-        <div><strong>Edad:</strong> ${edad}</div>
-        <div><strong>Matriculado:</strong> ${matriculado}</div>
-        <div><strong>Fecha de registro:</strong> ${fecha}</div>
-      `;
-      return li;
+      col.innerHTML = `
+        <div class="card h-100">
+          <img src="${foto}" class="card-img-top" alt="Foto de ${fila.nombre ?? 'Alumno'}">
+          <div class="card-body">
+            <h5 class="card-title mb-1">${fila.nombre ?? 'Sin nombre'}</h5>
+            <p class="text-muted mb-3">ID: ${fila.id ?? '—'}</p>
+            <ul class="list-unstyled mb-0">
+              <li><strong>Edad:</strong> ${fila.edad ?? '—'}</li>
+              <li><strong>Matriculado:</strong> ${matriculado}</li>
+              <li><strong>Registro:</strong> ${fecha}</li>
+            </ul>
+          </div>
+        </div>`;
+      return col;
     }
 
-    // Consulta todos los datos de la tabla "public.alumnos" y puebla la vista
-    async function cargarAlumnos() {
-      try {
-        mostrarEstado('Cargando datos de Supabase...');
-        listaEl.innerHTML = ''; // limpiar resultados previos
+    async function cargarAlumnos(){
+      try{
+        mostrarEstado('Cargando datos desde Supabase…');
+        resultadoEl.innerHTML = '';
 
-        // Consulta básica (puedes ajustar el orden si lo deseas)
         const { data, error } = await supabase
           .from('alumnos')
           .select('*')
           .order('id', { ascending: true });
 
-        if (error) {
-          // Error de Supabase (consulta/RLS/conexión)
-          console.error('Error en Supabase:', error);
-          mostrarEstado('No se pudo obtener la información. Detalle: ' + (error.message || 'Error desconocido.'));
+        if(error) throw error;
+
+        if(!data || data.length === 0){
+          mostrarEstado('No hay registros para mostrar.', 'warning');
           return;
         }
 
-        if (!data || data.length === 0) {
-          mostrarEstado('No hay registros para mostrar.');
-          return;
-        }
-
-        // Éxito: iterar sobre los resultados y crear elementos HTML
-        data.forEach((fila) => {
-          const item = crearItemAlumno(fila);
-          listaEl.appendChild(item);
-        });
-
-        mostrarEstado('Datos cargados correctamente.');
-      } catch (e) {
-        // Errores inesperados (red, parseo, etc.)
-        console.error('Excepción al cargar datos:', e);
-        mostrarEstado('Ocurrió un error al conectarse o consultar los datos. Inténtalo nuevamente más tarde.');
+        data.forEach(fila => resultadoEl.appendChild(crearTarjetaAlumno(fila)));
+        mostrarEstado('Datos cargados correctamente ✅', 'success');
+      }catch(e){
+        console.error(e);
+        mostrarEstado('Ocurrió un error al cargar los datos.', 'danger');
       }
     }
 
-    // Disparar la carga al iniciar
     document.addEventListener('DOMContentLoaded', cargarAlumnos);
   </script>
 </body>
 </html>
-
-
-
-
-
-
-Is this conversation helpful so far?
-
-
-
-
-MODO DE DESARROLLADOR
-
-
-
 
